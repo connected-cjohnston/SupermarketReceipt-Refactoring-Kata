@@ -12,6 +12,7 @@ class Teller
   def checks_out_articles_from(the_cart)
     receipt = Receipt.new
     product_quantities = the_cart.items
+
     for pq in product_quantities do
       p = pq.product
       quantity = pq.quantity

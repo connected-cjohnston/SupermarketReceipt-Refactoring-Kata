@@ -1,13 +1,12 @@
-require_relative './test_helper'
+require 'spec_helper'
 
-class SupermarketTest < Minitest::Test
-
-  def test_ten_percent_discount
+RSpec.describe 'Supermarket' do
+  it 'should give a ten cent discount' do
     catalog = FakeCatalog.new
-    toothbrush = Product.new("toothbrush", ProductUnit::EACH)
+    toothbrush = Product.new('toothbrush', ProductUnit::EACH)
     catalog.add_product(toothbrush, 0.99)
 
-    apples = Product.new("apples", ProductUnit::KILO)
+    apples = Product.new('apples', ProductUnit::KILO)
     catalog.add_product(apples, 1.99)
 
     cart = ShoppingCart.new
@@ -18,7 +17,6 @@ class SupermarketTest < Minitest::Test
 
     receipt = teller.checks_out_articles_from(cart)
 
-    assert_in_delta 4.975, receipt.total_price, 0.01
+    expect(receipt.total_price).to be_within(0.01).of(4.975)
   end
-
 end

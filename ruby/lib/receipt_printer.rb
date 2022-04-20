@@ -1,5 +1,4 @@
 class ReceiptPrinter
-
   def initialize(columns = 40)
     @columns = columns
   end
@@ -53,5 +52,4 @@ class ReceiptPrinter
     end
     return whitespace
   end
-
 end

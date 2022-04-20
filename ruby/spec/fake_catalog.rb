@@ -1,6 +1,8 @@
-class FakeCatalog < SupermarketCatalog
+require_relative '../lib/models/supermarket_catalog'
 
+class FakeCatalog < SupermarketCatalog
   def initialize
+    super
     @products = {}
     @prices = {}
   end
@@ -10,8 +12,7 @@ class FakeCatalog < SupermarketCatalog
     @prices[product.name] = price
   end
 
-  def unit_price(p)
-    @prices.fetch(p.name)
+  def unit_price(product)
+    @prices.fetch(product.name)
   end
-
 end
