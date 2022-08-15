@@ -1,5 +1,4 @@
 class Teller
-
   def initialize(catalog)
     @catalog = catalog
     @offers = {}
@@ -13,7 +12,7 @@ class Teller
     receipt = Receipt.new
     product_quantities = the_cart.items
 
-    for pq in product_quantities do
+    product_quantities.each do |pq|
       p = pq.product
       quantity = pq.quantity
       unit_price = @catalog.unit_price(p)
@@ -24,5 +23,4 @@ class Teller
 
     receipt
   end
-
 end

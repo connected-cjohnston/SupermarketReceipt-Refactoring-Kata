@@ -28,7 +28,7 @@ class ShoppingCart
   end
 
   def handle_offers(receipt, offers, catalog)
-    for p in @product_quantities.keys do
+    @product_quantities.keys.each do |p|
       quantity = @product_quantities[p]
       if offers.key?(p)
         offer = offers[p]
@@ -48,7 +48,7 @@ class ShoppingCart
           end
 
         end
-        if offer.offer_type == SpecialOfferType:: FIVE_FOR_AMOUNT
+        if offer.offer_type == SpecialOfferType::FIVE_FOR_AMOUNT
           x = 5
         end
         number_of_x = quantity_as_int / x
