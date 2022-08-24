@@ -5,7 +5,7 @@ class ReceiptPrinter
 
   def print_receipt(receipt)
     result = ""
-    for item in receipt.items do
+    receipt.items.each do |item|
       price = "%.2f" % item.total_price
       quantity = self.class.present_quantity(item)
       name = item.product.name
@@ -18,9 +18,9 @@ class ReceiptPrinter
         line += "  " + unit_price + " * " + quantity + "\n"
       end
 
-      result.concat(line);
+      result.concat(line)
     end
-    for discount in receipt.discounts do
+    receipt.discounts.each do |discount|
       product_presentation = discount.product.name
       price_presentation = "%.2f" % discount.discount_amount
       description = discount.description
@@ -29,20 +29,20 @@ class ReceiptPrinter
       result.concat(product_presentation)
       result.concat(")")
       result.concat(self.class.whitespace(@columns - 3 - product_presentation.size - description.size - price_presentation.size))
-      result.concat("-");
-      result.concat(price_presentation);
-      result.concat("\n");
+      result.concat("-")
+      result.concat(price_presentation)
+      result.concat("\n")
     end
     result.concat("\n")
     price_presentation = "%.2f" % receipt.total_price.to_f
     total = "Total: "
     whitespace = self.class.whitespace(@columns - total.size - price_presentation.size)
     result.concat(total, whitespace, price_presentation)
-    return result.to_s
+    result.to_s
   end
 
   def self.present_quantity(item)
-    return ProductUnit::EACH == item.product.unit ? '%x' % item.quantity.to_i : '%.3f' % item.quantity
+    ProductUnit::EACH == item.product.unit ? '%x' % item.quantity.to_i : '%.3f' % item.quantity
   end
 
   def self.whitespace(whitespace_size)
@@ -50,6 +50,7 @@ class ReceiptPrinter
     whitespace_size.times do
       whitespace.concat(' ')
     end
-    return whitespace
+
+    whitespace
   end
 end

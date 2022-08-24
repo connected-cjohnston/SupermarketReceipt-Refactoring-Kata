@@ -1,4 +1,4 @@
 module ProductUnit
-  EACH = Object.new
-  KILO = Object.new
+  EACH = :each
+  KILO = :kilo
 end

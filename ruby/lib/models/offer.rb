@@ -3,7 +3,7 @@ class Offer
 
   def initialize(offer_type, product, argument)
     @offer_type = offer_type
-    @argument = argument
     @product = product
+    @argument = argument
   end
 end
