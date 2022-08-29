@@ -6,4 +6,8 @@ class Discount
     @description = description
     @discount_amount = discount_amount
   end
+
+  def ==(other)
+    product == other.product && description = other.description && discount_amount && other.discount_amount
+  end
 end
