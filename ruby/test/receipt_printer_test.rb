@@ -3,8 +3,6 @@ require_relative './test_helper'
 class ReceiptPrinterTest < Minitest::Test
   include Approvals
 
-  cover "Kata*"
-
   def setup
     @toothbrush = Kata::Product.new("toothbrush", Kata::ProductUnit::EACH)
     @apples = Kata::Product.new("apples", Kata::ProductUnit::KILO)

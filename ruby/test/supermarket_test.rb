@@ -3,8 +3,6 @@ require_relative './test_helper'
 class SupermarketTest < Minitest::Test
   include Approvals
 
-  cover "Kata*"
-
   def setup
     @catalog = FakeCatalog.new
     @teller = Kata::Teller.new(@catalog)
