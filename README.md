@@ -1,6 +1,6 @@
 # The Supermarket Receipt Refactoring Kata
 
-This is a variation of a popular kata described in http://codekata.com/kata/kata01-supermarket-pricing/. The aim of the exercise is to build automated tests for this code, refactor it, and add a new feature. 
+This is a variation of a popular kata described in http://codekata.com/kata/kata01-supermarket-pricing/. The aim of the exercise is to build automated tests for this code, refactor it, and add a new feature.
 
 The supermarket has a catalog with different types of products (rice, apples, milk, toothbrushes,...). Each product has a price, and the total price of the shopping cart is the total of all the prices of the items. You get a receipt that details the items you've bought, the total price and any discounts that were applied.
 
@@ -26,15 +26,15 @@ you get 10% off the total for those items. For example you could make a bundle o
 
 ## New feature: HTML receipt
 
-Currently we print a traditional ticket receipt. Now beeing a modern business we'd
-like to be able to print or send a HTML version of the same receipt. All the data 
-and number formatting should be the same. However the layout should be html. 
-You don't have to worry about the HTML template - a designer will care of that - but 
+Currently we print a traditional ticket receipt. Now being a modern business we'd
+like to be able to print or send a HTML version of the same receipt. All the data
+and number formatting should be the same. However the layout should be html.
+You don't have to worry about the HTML template - a designer will care of that - but
 we do need someone to keep duplication between the reports to a bare minimum.
 
 ## Start with the refactoring
 
-If you would like to just do the refactoring part of this exercise, you can instead check out the 'with_tests' branch. 
+If you would like to just do the refactoring part of this exercise, you can instead check out the 'with_tests' branch.
 Those tests have reasonably good coverage and should support most kinds of refactorings you'd like to do.
 
 ## Use this exercise in a Learning Hour
