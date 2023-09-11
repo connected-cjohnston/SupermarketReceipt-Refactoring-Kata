@@ -1,4 +1,4 @@
 defmodule Models.ProductUnit do
-  @each :each
-  @kilo :kilo
+  def each, do: :each
+  def kilo, do: :kilo
 end

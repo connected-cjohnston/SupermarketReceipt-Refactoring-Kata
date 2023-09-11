@@ -1,6 +1,6 @@
 defmodule Models.SpecialOfferType do
-  @three_for_two :three_for_two
-  @ten_percent_discount :ten_percent_discount
-  @two_for_amount :two_for_amount
-  @five_for_amount :five_for_amount
+  def three_for_two, do: :three_for_two
+  def ten_percent_discount, do: :ten_percent_discount
+  def two_for_amount, do: :two_for_amount
+  def five_for_amount, do: :five_for_amount
 end
