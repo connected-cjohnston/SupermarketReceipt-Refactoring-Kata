@@ -12,6 +12,7 @@ defmodule Models.SupermarketCatalog do
   end
 
   def unit_price(catalog, product) do
-    Map.fetch(catalog.prices, product.name)
+    {:ok, unit_price} = Map.fetch(catalog.prices, product.name)
+    unit_price
   end
 end
