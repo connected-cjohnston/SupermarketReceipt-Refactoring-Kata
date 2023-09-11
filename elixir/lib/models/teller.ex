@@ -40,7 +40,7 @@ defmodule Models.Teller do
       Enum.each(product_quantities, fn pq ->
         product = pq.product
         quantity = pq.quantity
-        unit_price = teller.catalog.unit_price(teller.catalog, product)
+        unit_price = Models.SupermarketCatalog.unit_price(teller.catalog, product)
         price = quantity * unit_price
         Receipt.add_product(receipt, product, quantity, unit_price, price)
       end)
