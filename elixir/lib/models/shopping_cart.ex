@@ -1,22 +1,46 @@
 defmodule Models.ShoppingCart do
+  @moduledoc """
+  Functions for a shopping cart
+  """
   defstruct items: [], product_quantities: %{}
 
+  alias Models.Discount
+
+  @doc """
+  Returns an empty shopping cart
+
+  ## Examples
+
+      iex> Models.ShoppingCart.initialize()
+      %Models.ShoppingCart{}
+
+  """
   def initialize do
     %Models.ShoppingCart{}
   end
 
-  def items do
-    []
-  end
+  @doc """
+  Adds a single item to the shopping cart
 
+  ## Examples
+
+      iex> Models.ShoppingCart.add_item(%Models.ShoppingCart{}, %Models.Product{name: "product", unit: :each})
+      %Models.ShoppingCart{items: [%Models.ProductQuantity{product: %Models.Product{name: "product", unit: :each}, quantity: 1}], product_quantities: %{"product" => 1}}
+
+  """
   def add_item(shopping_cart, product) do
     add_item_quantity(shopping_cart, product, 1)
   end
 
-  def product_quantities(shopping_cart) do
-    shopping_cart.product_quantities
-  end
+  @doc """
+  Adds a given quantity of a product to the shopping cart
 
+  ## Examples
+
+      iex> Models.ShoppingCart.add_item_quantity(%Models.ShoppingCart{}, %Models.Product{name: "product", unit: :each}, 2)
+      %Models.ShoppingCart{items: [%Models.ProductQuantity{product: %Models.Product{name: "product", unit: :each}, quantity: 2}], product_quantities: %{"product" => 2}}
+
+  """
   def add_item_quantity(shopping_cart, product, quantity) do
     product_quantity = %Models.ProductQuantity{product: product, quantity: quantity}
     items = [product_quantity | shopping_cart.items]
@@ -29,7 +53,70 @@ defmodule Models.ShoppingCart do
     %Models.ShoppingCart{items: items, product_quantities: product_quantities}
   end
 
+  @doc """
+  Handles offers for the products in the shopping cart
+  """
   def handle_offers(cart, receipt, offers, catalog) do
-    receipt
+    Enum.each(Map.keys(cart.product_quantities), fn product ->
+      {:ok, quantity} = Map.fetch(cart.product_quantities, product.name)
+
+      if Enum.member?(Map.keys(offers), product.name) do
+        {:ok, offer} = Map.fetch(offers, product.name)
+        unit_price = Models.SupermarketCatalog.unit_price(catalog, product)
+        discount = nil
+
+        x =
+          cond do
+            offer.offer_type == :three_for_two ->
+              3
+
+            offer.offer_type == :two_for_amount ->
+              2
+
+              if quantity >= 2 do
+                total = offer.argument * (quantity / 2) + rem(quantity, 2) * unit_price
+                discount_n = unit_price * quantity - total
+                discount = Discount.initialize(product, "2 for #{offer.argument}", discount_n)
+              end
+
+            offer.offer_type == :five_for_amount ->
+              5
+
+            true ->
+              1
+          end
+
+        number_of_x = quantity / x
+
+        discount =
+          cond do
+            offer.offer_type == :three_for_two && quantity > 2 ->
+              discount_amount =
+                quantity * unit_price -
+                  (number_of_x * 2 * unit_price + rem(quantity, 3) * unit_price)
+
+              Discount.initialize(product, "3 for 2", discount_amount)
+
+            offer.offer_type == :ten_percent_discount ->
+              Discount.initialize(
+                product,
+                "#{offer.argument.to_s}% off",
+                quantity * unit_price * offer.argument / 100.0
+              )
+
+            offer.offer_type == :five_for_amount && quantity >= 5 ->
+              discount_total =
+                unit_price * quantity -
+                  (offer.argument * number_of_x + rem(quantity, 5) * unit_price)
+
+              Discount.initialize(product, "#{x} for #{offer.argument}", discount_total)
+
+            true ->
+              nil
+          end
+
+        Models.Receipt.add_discount(receipt, discount)
+      end
+    end)
   end
 end
