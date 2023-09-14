@@ -10,61 +10,6 @@ defmodule Models.ShoppingCartTest do
      catalog: Models.SupermarketCatalog.initialize()}
   end
 
-  test "should return an empty receipt when the cart is empty", state do
-    teller = Models.Teller.initialize(state[:catalog])
-
-    receipt =
-      Models.ShoppingCart.handle_offers(
-        state[:cart],
-        state[:receipt],
-        teller.offers,
-        state[:catalog]
-      )
-
-    assert receipt == %Models.Receipt{}
-    assert 0.0 == Models.Receipt.total_price(receipt)
-  end
-
-  test "should return receipt with a product when there is one product and no offer", state do
-    product = Models.Product.initialize("bread", :each)
-    catalog = Models.SupermarketCatalog.add_product(state[:catalog], product, 2.55)
-    cart = Models.ShoppingCart.add_item(state[:cart], product)
-    teller = Models.Teller.initialize(state[:catalog])
-
-    receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
-
-    assert Models.Receipt.total_price(receipt) == 2.55
-  end
-
-  test "should return receipt with two products", state do
-    product1 = Models.Product.initialize("bread", :each)
-    product2 = Models.Product.initialize("cheese", :each)
-
-    catalog = Models.SupermarketCatalog.initialize()
-    catalog = Models.SupermarketCatalog.add_product(catalog, product1, 2.55)
-    catalog = Models.SupermarketCatalog.add_product(catalog, product2, 5.00)
-
-    cart = Models.ShoppingCart.add_item_quantity(state[:cart], product1, 1)
-    cart = Models.ShoppingCart.add_item_quantity(cart, product2, 1)
-
-    teller = Models.Teller.initialize(state[:catalog])
-
-    receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
-
-    assert Models.Receipt.total_price(receipt) == 7.55
-  end
-
-  test "should return receipt with 5 loaves of bread", state do
-    product = Models.Product.initialize("bread", :each)
-    catalog = Models.SupermarketCatalog.add_product(state[:catalog], product, 2.50)
-    cart = Models.ShoppingCart.add_item_quantity(state[:cart], product, 5)
-    teller = Models.Teller.initialize(state[:catalog])
-
-    receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
-
-    assert Models.Receipt.total_price(receipt) == 12.5
-  end
-
   test "ten percent discount", state do
     product = Models.Product.initialize("bread", :each)
     catalog = Models.SupermarketCatalog.add_product(state[:catalog], product, 10.00)
@@ -74,7 +19,16 @@ defmodule Models.ShoppingCartTest do
 
     receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
 
-    assert Models.Receipt.total_price(receipt) == 9.00
+    assert receipt == %Models.Receipt{
+             discounts: [
+               %Models.Discount{
+                 product: %Models.Product{name: "bread", unit: :each},
+                 description: "10.0% off",
+                 discount_amount: 1.0
+               }
+             ],
+             items: []
+           }
   end
 
   test "two for amount", state do
@@ -86,7 +40,16 @@ defmodule Models.ShoppingCartTest do
 
     receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
 
-    assert Models.Receipt.total_price(receipt) == 2.0
+    assert receipt == %Models.Receipt{
+             discounts: [
+               %Models.Discount{
+                 description: "2 for 2.0",
+                 discount_amount: 1.0,
+                 product: %Models.Product{name: "bread", unit: :each}
+               }
+             ],
+             items: []
+           }
   end
 
   test "three for two", state do
@@ -98,7 +61,16 @@ defmodule Models.ShoppingCartTest do
 
     receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
 
-    assert Models.Receipt.total_price(receipt) == 3.0
+    assert receipt == %Models.Receipt{
+             discounts: [
+               %Models.Discount{
+                 description: "3 for 2",
+                 discount_amount: 1.5,
+                 product: %Models.Product{name: "bread", unit: :each}
+               }
+             ],
+             items: []
+           }
   end
 
   test "five for amount", state do
@@ -110,6 +82,15 @@ defmodule Models.ShoppingCartTest do
 
     receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
 
-    assert Models.Receipt.total_price(receipt) == 6.5
+    assert receipt == %Models.Receipt{
+             discounts: [
+               %Models.Discount{
+                 description: "5 for 6.5",
+                 discount_amount: 1.0,
+                 product: %Models.Product{name: "bread", unit: :each}
+               }
+             ],
+             items: []
+           }
   end
 end

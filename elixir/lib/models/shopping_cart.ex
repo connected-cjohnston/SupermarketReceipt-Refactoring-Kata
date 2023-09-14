@@ -66,7 +66,6 @@ defmodule Models.ShoppingCart do
   defp handle_offer([product_quantity | product_quantities], receipt, offers, catalog) do
     product = product_quantity.product
     quantity = product_quantity.quantity
-    price = Models.SupermarketCatalog.unit_price(catalog, product)
     unit_price = Models.SupermarketCatalog.unit_price(catalog, product)
 
     discount =
@@ -110,15 +109,6 @@ defmodule Models.ShoppingCart do
         :error ->
           nil
       end
-
-    receipt =
-      Models.Receipt.add_product(
-        receipt,
-        product,
-        quantity,
-        price,
-        price * quantity
-      )
 
     receipt = Models.Receipt.add_discount(receipt, discount)
 
