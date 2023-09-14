@@ -79,6 +79,14 @@ defmodule Models.ShoppingCart do
                 "#{offer.argument}% off",
                 quantity * unit_price * offer.argument / 100.0
               )
+
+            offer.offer_type == :two_for_amount ->
+              total = offer.argument * (quantity / 2) + rem(quantity, 2) * unit_price
+              discount_n = unit_price * quantity - total
+              Models.Discount.initialize(product, "2 for #{offer.argument}", discount_n)
+
+            true ->
+              nil
           end
 
         :error ->
