@@ -25,8 +25,8 @@ defmodule Models.Teller do
   Adds a special offer to the teller
   """
   def add_special_offer(teller, offer_type, product, argument) do
-    offers = [Offer.initialize(offer_type, product, argument) | teller.offers]
-    %Models.Teller{teller | offers: offers}
+    offer = Offer.initialize(offer_type, product, argument)
+    %Models.Teller{teller | offers: Map.put(teller.offers, product, offer)}
   end
 
   @doc """
@@ -45,6 +45,6 @@ defmodule Models.Teller do
         Receipt.add_product(receipt, product, quantity, unit_price, price)
       end)
 
-    ShoppingCart.handle_offers(cart, receipt, teller.offers, teller.catalog)
+    ShoppingCart.handle_offers(cart, receipt, teller)
   end
 end
