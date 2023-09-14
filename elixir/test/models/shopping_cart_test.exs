@@ -100,4 +100,16 @@ defmodule Models.ShoppingCartTest do
 
     assert Models.Receipt.total_price(receipt) == 3.0
   end
+
+  test "five for amount", state do
+    product = Models.Product.initialize("bread", :each)
+    catalog = Models.SupermarketCatalog.add_product(state[:catalog], product, 1.50)
+    cart = Models.ShoppingCart.add_item_quantity(state[:cart], product, 5)
+    teller = Models.Teller.initialize(catalog)
+    teller = Models.Teller.add_special_offer(teller, :five_for_amount, product, 6.50)
+
+    receipt = Models.ShoppingCart.handle_offers(cart, state[:receipt], teller.offers, catalog)
+
+    assert Models.Receipt.total_price(receipt) == 6.5
+  end
 end

@@ -74,25 +74,34 @@ defmodule Models.ShoppingCart do
         {:ok, offer} ->
           cond do
             offer.offer_type == :ten_percent_discount ->
-              Models.Discount.initialize(
+              Discount.initialize(
                 product,
                 "#{offer.argument}% off",
                 quantity * unit_price * offer.argument / 100.0
               )
 
-            offer.offer_type == :two_for_amount ->
+            offer.offer_type == :two_for_amount && quantity >= 2 ->
               total = offer.argument * (quantity / 2) + rem(quantity, 2) * unit_price
               discount_n = unit_price * quantity - total
-              Models.Discount.initialize(product, "2 for #{offer.argument}", discount_n)
+              Discount.initialize(product, "2 for #{offer.argument}", discount_n)
 
-            offer.offer_type == :three_for_two ->
+            offer.offer_type == :three_for_two && quantity >= 2 ->
               number_of_x = quantity / 3
 
               discount_amount =
                 quantity * unit_price -
                   (number_of_x * 2 * unit_price + rem(quantity, 3) * unit_price)
 
-              Models.Discount.initialize(product, "3 for 2", discount_amount)
+              Discount.initialize(product, "3 for 2", discount_amount)
+
+            offer.offer_type == :five_for_amount && quantity >= 5 ->
+              number_of_x = quantity / 5
+
+              discount_total =
+                unit_price * quantity -
+                  (offer.argument * number_of_x + rem(quantity, 5) * unit_price)
+
+              Discount.initialize(product, "5 for #{offer.argument}", discount_total)
 
             true ->
               nil
