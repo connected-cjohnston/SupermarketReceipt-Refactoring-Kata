@@ -57,24 +57,45 @@ defmodule Models.ShoppingCart do
   @doc """
   Handles offers for the products in the shopping cart
   """
-  def handle_offers(cart, receipt, catalog) do
-    handle_offer(cart.items, receipt, catalog)
+  def handle_offers(cart, receipt, offers, catalog) do
+    handle_offer(cart.items, receipt, offers, catalog)
   end
 
-  defp handle_offer([], receipt, _catalog), do: receipt
+  defp handle_offer([], receipt, _offers, _catalog), do: receipt
 
-  defp handle_offer([product_quantity | product_quantities], receipt, catalog) do
-    price = Models.SupermarketCatalog.unit_price(catalog, product_quantity.product)
+  defp handle_offer([product_quantity | product_quantities], receipt, offers, catalog) do
+    product = product_quantity.product
+    quantity = product_quantity.quantity
+    price = Models.SupermarketCatalog.unit_price(catalog, product)
+    unit_price = Models.SupermarketCatalog.unit_price(catalog, product)
+
+    discount =
+      case Map.fetch(offers, product) do
+        {:ok, offer} ->
+          cond do
+            offer.offer_type == :ten_percent_discount ->
+              Models.Discount.initialize(
+                product,
+                "#{offer.argument}% off",
+                quantity * unit_price * offer.argument / 100.0
+              )
+          end
+
+        :error ->
+          nil
+      end
 
     receipt =
       Models.Receipt.add_product(
         receipt,
-        product_quantity.product,
-        product_quantity.quantity,
+        product,
+        quantity,
         price,
-        price * product_quantity.quantity
+        price * quantity
       )
 
-    handle_offer(product_quantities, receipt, catalog)
+    receipt = Models.Receipt.add_discount(receipt, discount)
+
+    handle_offer(product_quantities, receipt, offers, catalog)
   end
 end

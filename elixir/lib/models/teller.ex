@@ -45,6 +45,6 @@ defmodule Models.Teller do
         Receipt.add_product(receipt, product, quantity, unit_price, price)
       end)
 
-    ShoppingCart.handle_offers(cart, receipt, teller)
+    ShoppingCart.handle_offers(cart, receipt, cart.offers, teller)
   end
 end
