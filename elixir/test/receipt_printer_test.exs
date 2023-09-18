@@ -3,7 +3,7 @@ defmodule ReceiptPrinterTest do
   doctest ReceiptPrinter
 
   test "prints a receipt with two items" do
-    product = Models.Product.initialize("toothbrush", :each)
+    product = Models.Product.initialize("toothbrush", Models.ProductUnit.each())
     receipt = Models.Receipt.initialize()
     receipt = Models.Receipt.add_product(receipt, product, 1, 0.99, 0.99)
     receipt = Models.Receipt.add_product(receipt, product, 1, 0.99, 0.99)
@@ -17,7 +17,7 @@ defmodule ReceiptPrinterTest do
   end
 
   test "buy three get one free" do
-    product = Models.Product.initialize("toothbrush", :each)
+    product = Models.Product.initialize("toothbrush", Models.ProductUnit.each())
     receipt = Models.Receipt.initialize()
     receipt = Models.Receipt.add_product(receipt, product, 1, 0.99, 0.99)
     receipt = Models.Receipt.add_product(receipt, product, 1, 0.99, 0.99)

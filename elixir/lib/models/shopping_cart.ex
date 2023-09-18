@@ -5,6 +5,7 @@ defmodule Models.ShoppingCart do
   defstruct items: [], product_quantities: %{}
 
   alias Models.Discount
+  alias Models.SpecialOfferType
 
   @doc """
   Returns an empty shopping cart
@@ -73,26 +74,26 @@ defmodule Models.ShoppingCart do
         {:ok, offer} ->
           x =
             cond do
-              offer.offer_type == :three_for_two -> 3
-              offer.offer_type == :two_for_amount -> 2
-              offer.offer_type == :five_for_amount -> 5
+              offer.offer_type == SpecialOfferType.three_for_two() -> 3
+              offer.offer_type == SpecialOfferType.two_for_amount() -> 2
+              offer.offer_type == SpecialOfferType.five_for_amount() -> 5
               true -> 1
             end
 
           cond do
-            offer.offer_type == :ten_percent_discount ->
+            offer.offer_type == SpecialOfferType.ten_percent_discount() ->
               Discount.initialize(
                 p,
                 "#{offer.argument}% off",
                 quantity * unit_price * offer.argument / 100.0
               )
 
-            offer.offer_type == :two_for_amount && quantity >= 2 ->
+            offer.offer_type == SpecialOfferType.two_for_amount() && quantity >= 2 ->
               total = offer.argument * (quantity / 2) + rem(quantity, 2) * unit_price
               discount_n = unit_price * quantity - total
               Discount.initialize(p, "2 for #{offer.argument}", discount_n)
 
-            offer.offer_type == :three_for_two && quantity >= 2 ->
+            offer.offer_type == SpecialOfferType.three_for_two() && quantity >= 2 ->
               number_of_x = quantity / x
 
               discount_amount =
@@ -101,7 +102,7 @@ defmodule Models.ShoppingCart do
 
               Discount.initialize(p, "3 for 2", discount_amount)
 
-            offer.offer_type == :five_for_amount && quantity >= 5 ->
+            offer.offer_type == SpecialOfferType.five_for_amount() && quantity >= 5 ->
               number_of_x = quantity / x
 
               discount_total =
