@@ -21,6 +21,5 @@ When you're confident you can handle this code, implement the new feature descri
 
 ## New feature: discounted bundles
 
-The owner of the system has a new feature request. They want to introduce a new kind of special offer - bundles. When you buy all the items in a product bundle
-you get 10% off the total for those items. For example you could make a bundle offer of one toothbrush and one toothpaste. If you then you buy one toothbrush and one toothpaste, the discount will be 10% of €0.99 + €1.79. If you instead buy two toothbrushes and one toothpaste, you get the same discount as if you'd bought only one of each - ie only complete bundles are discounted.
+The owner of the system has a new feature request. They want to introduce a new kind of special offer - bundles. When you buy all the items in a product bundle you get 10% off the total for those items. For example you could make a bundle offer of one toothbrush and one toothpaste. If you then buy one toothbrush and one toothpaste, the discount will be 10% of €0.99 + €1.79. If you instead buy two toothbrushes and one toothpaste, you get the same discount as if you'd bought only one of each - ie only complete bundles are discounted.
 
