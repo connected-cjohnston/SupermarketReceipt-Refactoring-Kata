@@ -59,7 +59,7 @@ defmodule Models.Teller do
 
     receipt = check_out_product(product_quantities, receipt, teller, cart)
 
-    ShoppingCart.handle_offers(cart, receipt, teller.offers, teller.catalog)
+    handle_offers(cart, receipt, teller.offers, teller.catalog)
   end
 
   defp check_out_product([], receipt, _teller, _cart), do: receipt
@@ -72,5 +72,12 @@ defmodule Models.Teller do
     receipt = Receipt.add_product(receipt, product, quantity, unit_price, price)
 
     check_out_product(product_quantities, receipt, teller, cart)
+  end
+
+  @doc """
+  Handles offers for the products in the shopping cart
+  """
+  def handle_offers(cart, receipt, offers, catalog) do
+    Models.OfferHandler.handle_offer(cart.items, receipt, offers, catalog)
   end
 end

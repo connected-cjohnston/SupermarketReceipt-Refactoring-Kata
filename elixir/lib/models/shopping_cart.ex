@@ -4,9 +4,6 @@ defmodule Models.ShoppingCart do
   """
   defstruct items: [], product_quantities: %{}
 
-  alias Models.Discount
-  alias Models.SpecialOfferType
-
   @doc """
   Returns an empty shopping cart
 
@@ -53,74 +50,5 @@ defmodule Models.ShoppingCart do
       end)
 
     %Models.ShoppingCart{items: items, product_quantities: product_quantities}
-  end
-
-  @doc """
-  Handles offers for the products in the shopping cart
-  """
-  def handle_offers(cart, receipt, offers, catalog) do
-    handle_offer(cart.items, receipt, offers, catalog)
-  end
-
-  defp handle_offer([], receipt, _offers, _catalog), do: receipt
-
-  defp handle_offer([pq | product_quantities], receipt, offers, catalog) do
-    p = pq.product
-    quantity = pq.quantity
-    unit_price = Models.SupermarketCatalog.unit_price(catalog, p)
-
-    discount =
-      case Map.fetch(offers, p) do
-        {:ok, offer} ->
-          x =
-            cond do
-              offer.offer_type == SpecialOfferType.three_for_two() -> 3
-              offer.offer_type == SpecialOfferType.two_for_amount() -> 2
-              offer.offer_type == SpecialOfferType.five_for_amount() -> 5
-              true -> 1
-            end
-
-          cond do
-            offer.offer_type == SpecialOfferType.ten_percent_discount() ->
-              Discount.initialize(
-                p,
-                "#{offer.argument}% off",
-                quantity * unit_price * offer.argument / 100.0
-              )
-
-            offer.offer_type == SpecialOfferType.two_for_amount() && quantity >= 2 ->
-              total = offer.argument * (quantity / 2) + rem(quantity, 2) * unit_price
-              discount_n = unit_price * quantity - total
-              Discount.initialize(p, "2 for #{offer.argument}", discount_n)
-
-            offer.offer_type == SpecialOfferType.three_for_two() && quantity >= 2 ->
-              number_of_x = quantity / x
-
-              discount_amount =
-                quantity * unit_price -
-                  (number_of_x * 2 * unit_price + rem(quantity, 3) * unit_price)
-
-              Discount.initialize(p, "3 for 2", discount_amount)
-
-            offer.offer_type == SpecialOfferType.five_for_amount() && quantity >= 5 ->
-              number_of_x = quantity / x
-
-              discount_total =
-                unit_price * quantity -
-                  (offer.argument * number_of_x + rem(quantity, 5) * unit_price)
-
-              Discount.initialize(p, "#{x} for #{offer.argument}", discount_total)
-
-            true ->
-              nil
-          end
-
-        :error ->
-          nil
-      end
-
-    receipt = Models.Receipt.add_discount(receipt, discount)
-
-    handle_offer(product_quantities, receipt, offers, catalog)
   end
 end
