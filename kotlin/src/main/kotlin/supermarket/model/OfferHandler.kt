@@ -1,41 +1,27 @@
 package supermarket.model
 
-class OfferHandler {
-    fun handleOffer(
-        product: Product,
-        offers: Map<Product, Offer>,
-        catalog: SupermarketCatalog,
-        receipt: Receipt,
-        productQuantities: MutableMap<Product, Double>
-    ) {
-        val quantity = productQuantities[product]!!
-        val offer = offers[product]!!
-        val unitPrice = catalog.getUnitPrice(product)
-        val quantityAsInt = quantity.toInt()
-        var discount: Discount? = null
-        var quantityAmount = quantityAmount(offer)
-        val numberOfXs = quantityAsInt / quantityAmount
+class OfferHandler(
+    val product: Product,
+    private val offers: Map<Product, Offer>,
+    private val catalog: SupermarketCatalog,
+    private val receipt: Receipt,
+    private val productQuantities: MutableMap<Product, Double>
+) {
 
-        if (isTwoForAmount(offer, quantityAsInt)) {
-            discount =
-                createTwoForAmountDiscount(offer, quantityAsInt, quantityAmount, unitPrice, quantity, product)
+    fun handleOffer() {
+        var discount: Discount? = null
+
+        if (isTwoForAmount()) {
+            discount = createTwoForAmountDiscount()
         }
-        if (isThreeForTwo(offer, quantityAsInt)) {
-            discount = createThreeForAmountDiscount(quantity, unitPrice, numberOfXs, quantityAsInt, product)
+        if (isThreeForTwo()) {
+            discount = createThreeForAmountDiscount()
         }
-        if (isTenPercentDiscount(offer)) {
-            discount = createTenPercentDiscount(product, offer, quantity, unitPrice)
+        if (isTenPercentDiscount()) {
+            discount = createTenPercentDiscount()
         }
-        if (isFiveForAmount(offer, quantityAsInt)) {
-            discount = createFiveForAmountDiscount(
-                unitPrice,
-                quantity,
-                offer,
-                numberOfXs,
-                quantityAsInt,
-                product,
-                quantityAmount
-            )
+        if (isFiveForAmount()) {
+            discount = createFiveForAmountDiscount()
         }
 
 
@@ -43,76 +29,68 @@ class OfferHandler {
             receipt.addDiscount(discount)
     }
 
-    private fun quantityAmount(offer: Offer): Int {
-        var quantity_amount = 1
+    private fun quantityAsInt(): Int {
+        return quantity().toInt()
+    }
 
-        if (offer.offerType === SpecialOfferType.ThreeForTwo) {
-            quantity_amount = 3
-        } else if (offer.offerType === SpecialOfferType.TwoForAmount) {
-            quantity_amount = 2
-        } else if (offer.offerType === SpecialOfferType.FiveForAmount) {
-            quantity_amount = 5
+    private fun unitPrice(): Double {
+        return catalog.getUnitPrice(product)
+    }
+
+    private fun offer(): Offer {
+        return offers[product]!!
+    }
+
+    private fun quantity(): Double {
+        return productQuantities[product]!!
+    }
+
+    private fun quantityAmount(): Int {
+        if (offer().offerType === SpecialOfferType.ThreeForTwo) {
+            return 3
+        } else if (offer().offerType === SpecialOfferType.TwoForAmount) {
+            return 2
+        } else if (offer().offerType === SpecialOfferType.FiveForAmount) {
+            return 5
+        } else {
+            return 1
         }
-
-        return quantity_amount
     }
 
-    private fun isFiveForAmount(offer: Offer, quantityAsInt: Int) =
-        offer.offerType === SpecialOfferType.FiveForAmount && quantityAsInt >= 5
+    private fun isFiveForAmount() =
+        offer().offerType === SpecialOfferType.FiveForAmount && quantityAsInt() >= 5
 
-    private fun isTenPercentDiscount(offer: Offer) = offer.offerType === SpecialOfferType.TenPercentDiscount
+    private fun isTenPercentDiscount() = offer().offerType === SpecialOfferType.TenPercentDiscount
 
-    private fun isThreeForTwo(offer: Offer, quantityAsInt: Int) =
-        offer.offerType === SpecialOfferType.ThreeForTwo && quantityAsInt > 2
+    private fun isThreeForTwo() =
+        this.offer().offerType === SpecialOfferType.ThreeForTwo && quantityAsInt() > 2
 
-    private fun isTwoForAmount(offer: Offer, quantityAsInt: Int) =
-        offer.offerType === SpecialOfferType.TwoForAmount && quantityAsInt >= 2
+    private fun isTwoForAmount() =
+        offer().offerType === SpecialOfferType.TwoForAmount && quantityAsInt() >= 2
 
-    private fun createFiveForAmountDiscount(
-        unitPrice: Double,
-        quantity: Double,
-        offer: Offer,
-        numberOfXs: Int,
-        quantityAsInt: Int,
-        product: Product,
-        quantityAmount: Int
-    ): Discount? {
+    private fun createFiveForAmountDiscount(): Discount? {
         val discountTotal =
-            unitPrice * quantity - (offer.argument * numberOfXs + quantityAsInt % 5 * unitPrice)
-        return Discount(product, quantityAmount.toString() + " for " + offer.argument, discountTotal)
+            unitPrice() * quantity() - (offer().argument * numberOfXs() + quantityAsInt() % 5 * unitPrice())
+        return Discount(product, quantityAmount().toString() + " for " + offer().argument, discountTotal)
     }
 
-    private fun createTenPercentDiscount(
-        product: Product,
-        offer: Offer,
-        quantity: Double,
-        unitPrice: Double
-    ): Discount? {
-        return Discount(product, offer.argument.toString() + "% off", quantity * unitPrice * offer.argument / 100.0)
+    private fun createTenPercentDiscount(): Discount? {
+        return Discount(product, offer().argument.toString() + "% off", quantity() * unitPrice() * offer().argument / 100.0)
     }
 
-    private fun createThreeForAmountDiscount(
-        quantity: Double,
-        unitPrice: Double,
-        numberOfXs: Int,
-        quantityAsInt: Int,
-        product: Product
-    ): Discount? {
+    private fun createThreeForAmountDiscount(): Discount? {
         val discountAmount =
-            quantity * unitPrice - (numberOfXs.toDouble() * 2.0 * unitPrice + quantityAsInt % 3 * unitPrice)
+            quantity() * unitPrice() - (numberOfXs().toDouble() * 2.0 * unitPrice() + quantityAsInt() % 3 * unitPrice())
         return Discount(product, "3 for 2", discountAmount)
     }
 
-    private fun createTwoForAmountDiscount(
-        offer: Offer,
-        quantityAsInt: Int,
-        quantityAmount: Int,
-        unitPrice: Double,
-        quantity: Double,
-        product: Product
-    ): Discount? {
-        val total = offer.argument * (quantityAsInt / quantityAmount) + quantityAsInt % 2 * unitPrice
-        val discountN = unitPrice * quantity - total
-        return Discount(product, "2 for " + offer.argument, discountN)
+    private fun createTwoForAmountDiscount(): Discount? {
+        val total = offer().argument * (quantityAsInt() / quantityAmount()) + quantityAsInt() % 2 * unitPrice()
+        val discountN = unitPrice() * quantity() - total
+        return Discount(product, "2 for " + offer().argument, discountN)
+    }
+
+    private fun numberOfXs(): Int {
+        return quantityAsInt() / quantityAmount()
     }
 }
