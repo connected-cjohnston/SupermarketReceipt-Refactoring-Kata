@@ -37,7 +37,8 @@ class Teller(private val catalog: SupermarketCatalog) {
             if (!offers.containsKey(product))
                 break
 
-            OfferHandler(product, offers, catalog, receipt, theCart.productQuantities).handleOffer()
+            var discount: Discount? = OfferHandler(product, offers, catalog, theCart.productQuantities).discount()
+            if (discount != null) receipt.addDiscount(discount)
         }
     }
 }
