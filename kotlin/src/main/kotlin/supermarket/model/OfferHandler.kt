@@ -80,7 +80,7 @@ class OfferHandler(
 
     private fun createThreeForAmountDiscount(): Discount? {
         val discountAmount =
-            quantity() * unitPrice() - (numberOfXs().toDouble() * 2.0 * unitPrice() + quantityAsInt() % 3 * unitPrice())
+            (quantity() * unitPrice()) - ((numberOfXs().toDouble() * 2.0 * unitPrice()) + ((quantityAsInt() % 3) * unitPrice()))
         return Discount(product, "3 for 2", discountAmount)
     }
 
