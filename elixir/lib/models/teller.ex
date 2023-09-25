@@ -6,7 +6,6 @@ defmodule Models.Teller do
 
   alias Models.Offer
   alias Models.Receipt
-  alias Models.ShoppingCart
 
   @doc """
   Returns a new Teller with a given catalog
